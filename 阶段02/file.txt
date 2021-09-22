@@ -141,17 +141,17 @@ root@caohanlu:~# cat /root/.gitconfig
 
 * 将文件同步到本地仓库
 git commit [file] -m [message]
-说明: -m表示添加一些同步信息，表达同步内容,
+说明: -m表示添加一些同步信息【注释信息】，表达同步内容,
     不加file文件名表示同步所有暂存记录的文件
 
 e.g.  将暂存区所有记录同步到仓库区
-git commit  -m 'add files'
+git commit  -m 'add files注释信息'
 
 root@caohanlu:~/PycharmProjects/pythonProject# git commit  -m 'add files'
 root@caohanlu:~/PycharmProjects/pythonProject# git status  如果工作区跟仓库区完全一致，则如下 提示，否则需要重新add、commit文件
-On branch master
-nothing to commit, working tree clean
-root@caohanlu:~/PycharmProjects/pythonProject#
+    On branch master
+    nothing to commit, working tree clean
+    root@caohanlu:~/PycharmProjects/pythonProject#
 
 
 
