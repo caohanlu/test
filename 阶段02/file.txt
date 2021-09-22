@@ -236,7 +236,7 @@ root@caohanlu:~/PycharmProjects/pythonProject# git reset --hard b1a3c7f
 
   
 
-在
+
 * 创建标签
 
   * 标签: 在项目的重要commit位置添加快照，保存当时的工作状态，一般用于版本的迭代。
