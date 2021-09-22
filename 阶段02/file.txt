@@ -125,12 +125,9 @@ root@caohanlu:~# cat /root/.gitconfig
   将所有文件（不包含隐藏文件）记录到暂存区
   git add  *
     root@caohanlu:~/PycharmProjects/pythonProject# git add  *
-    root@caohanlu:~/PycharmProjects/pythonProject#
-
     root@caohanlu:~/PycharmProjects/pythonProject# git add  .gitignore      添加隐藏文件
 
-
-  【add后如果再次修改文件，则git  status会有问题，需要重新add被修改的文件】
+   【add后如果再次修改文件，则git  status会有问题，需要重新add被修改的文件】
 
 
 
@@ -151,6 +148,10 @@ e.g.  将暂存区所有记录同步到仓库区
 git commit  -m 'add files'
 
 root@caohanlu:~/PycharmProjects/pythonProject# git commit  -m 'add files'
+root@caohanlu:~/PycharmProjects/pythonProject# git status  如果工作区跟仓库区完全一致，则如下 提示，否则需要重新add、commit文件
+On branch master
+nothing to commit, working tree clean
+root@caohanlu:~/PycharmProjects/pythonProject#
 
 
 
