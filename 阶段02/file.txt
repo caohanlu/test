@@ -236,18 +236,16 @@ root@caohanlu:~/PycharmProjects/pythonProject# git reset --hard b1a3c7f
 
   
 
-
+在
 * 创建标签
 
   * 标签: 在项目的重要commit位置添加快照，保存当时的工作状态，一般用于版本的迭代。
-
-    ```
     git  tag  [tag_name] [commit_id] -m  [message]
     说明: commit_id可以不写则默认标签表示最新的commit_id位置，message也可以不写，但是最好添加。
     
     e.g. 在最新的commit处添加标签v1.0
     git tag v1.0 -m '版本1'
-    ```
+
 
 
 
