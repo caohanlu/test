@@ -195,31 +195,44 @@ root@caohanlu:~/PycharmProjects/pythonProject# git status  如果工作区跟仓
 
   
 
+
+
+
+
+
+
+
 ### 2.3 版本控制
 
 * 退回到上一个commit节点
-
-  ```
   git reset --hard HEAD^
-  说明： 一个^表示回退1个版本，依次类推。当版本回退之后工作区会自动和当前commit版本保持一致
-  ```
+  说明： 一个^表示回退1个版本，依次类推。
+        当版本回退之后，工作区会自动和会退后的commit版本保持一致
 
-  
 
-* 退回到指定的commit_id节点
-
-  ```
+* 退回到指定的commit_id节点【即指定日志中的版本号的前7位】
   git reset --hard [commit_id]
-  ```
 
+root@caohanlu:~/PycharmProjects/pythonProject# git log --pretty=oneline
+    b1a3c7fb75accd1cf39942d7ea23b421e548f100 add files
+root@caohanlu:~/PycharmProjects/pythonProject# git reset --hard b1a3c7f
   
 
-* 查看所有操作记录
 
-  ```
+
+* 查看所有操作记录【包括上面的reset记录】
   git reflog
   注意:最上面的为最新记录，可以利用commit_id去往任何操作位置
-  ```
+
+  git reflog查看操作记录，
+  然后通过操作记录的commit_id，使用git reset --hard [commit_id]去往任何位置
+  root@caohanlu:~/PycharmProjects/pythonProject# git reflog
+    6fcb173 (HEAD -> master) HEAD@{0}: commit: add files注释
+    2bf5fee HEAD@{1}: commit: add files注释
+    b1a3c7f HEAD@{2}: commit: add files
+  root@caohanlu:~/PycharmProjects/pythonProject# git reset --hard b1a3c7f
+
+
 
   
 
