@@ -160,27 +160,38 @@ root@caohanlu:~/PycharmProjects/pythonProject# git status  如果工作区跟仓
   git log
   git log --pretty=oneline
 
+    root@caohanlu:~/PycharmProjects/pythonProject# git log
+    commit 2bf5fee563660b36f6f24611473de82aac84fb68 (HEAD -> master)
+    Author: hanlu.cao <1033473839@qq.com>
+    Date:   Wed Sep 22 18:17:53 2021 +0800
+
+        add files注释
+
+    commit b1a3c7fb75accd1cf39942d7ea23b421e548f100
+    Author: hanlu.cao <1033473839@qq.com>
+    Date:   Wed Sep 22 18:12:41 2021 +0800
+
+        add files
+
 
   
 
-* 将暂存区或者某个commit点文件恢复到工作区
-
-  ```
+* 将暂存区、或者某个commit点文件，恢复到工作区
   git checkout [commit] -- [file]
   
-  e.g. 将a.jpg文件恢复,不写commit表示恢复最新保存的文件内容
+  将a.jpg文件恢复,不写commit表示恢复最新保存的文件内容【将误删、或者被修改的文件，从暂存区找回来】
   git checkout  --  a.jpg
-  ```
+
 
   
 
 * 移动或者删除文件
-
-  ```
   git  mv  [file] [path]
   git  rm  [files]
-  注意: 这两个操作会修改工作区内容，同时将操作记录提交到暂存区。
-  ```
+  注意: 这两个操作会修改工作区内容，
+      同时将操作记录提交到暂存区【git status可以看到操作内容】，
+      然后直接git commit提交到本地仓库就行
+
 
   
 
