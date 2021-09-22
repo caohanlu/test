@@ -249,7 +249,9 @@ root@caohanlu:~/PycharmProjects/pythonProject# git reset --hard b1a3c7f
     git tag v1.0 -m '版本1'
     ```
 
-    
+
+
+
 
 * 查看标签
 
