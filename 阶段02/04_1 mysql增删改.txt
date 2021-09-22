@@ -1,0 +1,493 @@
+总结：
+ 数据库操作
+   create database [db] charset=utf8;
+   show databases;
+   use [db];
+   select database();
+   drop databse [db];
+
+ 数字类型、字符串类型
+
+ 表创建、约束
+
+ 数据表操作
+   show tables;
+   desc [tb];
+   create table [tb] (col type,...);
+   drop table [tb];
+   show create table [tb];
+
+插入行insert
+insert into class_1 (name,age,sex,score) values ('Lucy',17,'w',81);
+
+更新表字段(update)
+update class_1 set age=11,sex='m' where name='Abby';
+
+删除行（delete）
+delete from class_1 where name='Abby';
+
+alter修改创建好的表
+
+时间类型数据
+   date   datetime  time  year  timestamp
+
+   curdate() now() curtime()
+
+
+
+
+======================================================================================
+======================================================================================
+======================================================================================
+======================================================================================
+
+
+
+mysql：开源、关系型数据库
+
+
+MySQL安装
+  Ubuntu安装MySQL服务
+    终端执行: sudo apt  install mysql-server
+    配置文件：/etc/mysql                         配置文件保持默认，不用配置
+    数据库存储目录 ：/var/lib/mysql               这个目录需要切换到root用户
+
+
+查看MySQL状态 :     sudo  service  mysql  status                默认开机自启
+启动/停止/重启服务：  sudo  service  mysql  start/stop/restart
+
+
+连接数据库
+    mysql -h mysql服务器ip地址 -u 用户名 -p
+       1. 回车后输入数据库密码,默认没密码
+       2. 如果链接自己主机数据库可省略 -h 选项
+       3.  mysql -u root -p
+          Enter password:
+          Welcome to the MySQL monitor.  Commands end with ; or \g.
+          Your MySQL connection id is 5
+          Server version: 5.7.35-0ubuntu0.18.04.1 (Ubuntu)
+
+          Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+          mysql>exit
+
+
+关闭连接
+    ctrl-D
+    exit
+
+
+
+
+
+
+
+MySQL数据库结构
+  >数据元素 --> 记录 -->数据表 --> 数据库
+
+基本概念解析
+  mysql服务：        一个mysql服务，可以创建、管理多个数据库
+  数据库：           一个数据库中，可能包含0张、一张或者多张表
+  数据表（table） ：  存放数据的表格
+  字段（column）：   每个列，用来表示该列数据的含义
+  记录（row）：      每个行，表示一组完整的数据
+  数据元素：         一行里的一个字段，叫数据元素
+
+
+
+
+
+
+
+
+SQL语言特点
+   每条命令以 ; 结尾
+   SQL命令（除了数据库名和表名），关键字和字符串可以不区分字母大小写
+
+
+1. 查看已有库
+
+>show databases;
+
+2. 创建库
+
+>create database 库名 [character set utf8];
+
+  创建数据库名字是stu，编码为utf8【支持中文】：
+  create database stu character set utf8;
+  或
+  create database stu charset=utf8;
+
+
+    > 注意：库名的命名
+    > 1.  数字、字母、下划线,但不能使用纯数字
+    > 2.  库名区分字母大小写
+    > 3.  不要使用特殊字符和mysql关键字
+
+
+
+3. 切换库
+
+>use 库名;
+  使用stu数据库
+  use stu;
+
+
+4. 查看当前所在库
+
+>select database();
+
+5. 删除库
+
+>drop database 库名;
+
+ 删除test数据库
+drop database test;
+
+
+
+
+
+
+
+3.5 数据表管理
+
+3.5.1 基础数据类型
+
+ 数字类型：
+   整数类型：INT，SMALLINT，TINYINT，MEDIUMINT，BIGINT
+   浮点类型：FLOAT，DOUBLE，DECIMAL
+   比特值类型：BIT
+
+类型			   占用空间大小			     范围（有符号）					范围（无符号）			    用途
+TINYINT			1 byte			(-128，127)						(0，255)				小整数值
+
+SMALLINT		2 bytes			(-32 768，32 767)				(0，65 535)				大整数值
+
+MEDIUMINT		3 bytes			(-8 388 608，8 388 607)			(0，16 777 215)			大整数值
+
+INT或INTEGER	4 bytes			(-2 147 483 648，2 147 483 647)	(0，4 294 967 295)		大整数值
+
+BIGINT			8 bytes			(-9,223,372,036,854,775,808，9 223 372 036 854 775 807)	(0，18 446 744 073 709 551 615)	极大整数值
+
+FLOAT			4 bytes			(-3.402 823 466 E+38，-1.175 494 351 E-38)，0，(1.175 494 351 E-38，3.402 823 466 351 E+38)
+																0，(1.175 494 351 E-38，3.402 823 466 E+38)				单精度 浮点数值
+
+DOUBLE			8 bytes			(-1.797 693 134 862 315 7 E+308，-2.225 073 858 507 201 4 E-308)，0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308)
+																0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308)	双精度 浮点数值
+
+DECIMAL			对DECIMAL(M,D)，	        依赖于M和D的值	            依赖于M和D的值	        小数值
+                如果M>D，为M+2否则为D+2
+
+
+> 1. 对于准确性要求比较高的东西，比如money，用decimal类型减少存储误差。
+    声明语法是DECIMAL(M,D)。M是数字的最大数字位数，D是小数点右侧数字的位数。
+    比如 DECIMAL(6,2)最多存6位数字，小数点后占2位,取值范围-9999.99到9999.99。
+
+> 2. 比特值类型指0，1值,表达2种情况，如真，假
+
+
+
+
+
+
+* 字符串类型：
+  * 普通字符串： CHAR，VARCHAR
+  * 存储文本： text，         是一些不常用，不常修改的数据，例如评论、朋友圈
+  * 存储二进制数据： BLOB      音频、视频、图片等
+  * 存储选项型数据：ENUM，SET
+
+类型			    大小				      用途
+CHAR			0-255 bytes			定长字符串
+VARCHAR			0-65535 bytes		变长字符串
+TINYBLOB		0-255 bytes			不超过 255 个字符的二进制字符串
+TINYTEXT		0-255 bytes			短文本字符串
+BLOB			0-65 535 bytes		二进制形式的长文本数据
+TEXT			0-65 535 bytes		长文本数据
+MEDIUMBLOB		0-16 777 215 bytes	二进制形式的中等长度文本数据
+MEDIUMTEXT		0-16 777 215 bytes	中等长度文本数据
+LONGBLOB		0-4 294 967 295 bytes	二进制形式的极大文本数据
+LONGTEXT		0-4 294 967 295 bytes	极大文本数据
+
+> 注意：
+>
+> 1. char：定长，即指定存储字节数后，无论实际存储了多少字节数据，最终都占指定的字节大小。
+          默认只能存1字节数据。
+          例如char(20),最多存储20字节的数据，即使存入的数据小于20字节，占用的空间大小还是20字节
+
+> 2. varchar：不定长，效率偏低 ，但是节省空间，实际占用空间根据实际存储数据大小而定。
+              必须要指定存储大小 ，例如varchar(50)，而真实存入的数据是15字节，则最终占用的空间是15字节
+
+> 3. enum枚举，用来存储给出的多个值中的一个值【必须是字符串】,即单选，enum('A','B','C')
+
+> 4. set集合，用来存储给出的多个值中一个或多个值【必须是字符串】，即多选，set('A','B','C')
+
+
+
+
+
+
+
+
+
+
+创建表
+>create table 表名(字段名 数据类型 约束,字段名 数据类型 约束,...字段名 数据类型 约束);
+
+   字段约束，【可写可不写】
+     unsigned:如果你想设置数字为无符号【即只是正数】，则加上 unsigned
+
+     NOT NULL:如果你不想字段为 NULL ，可以设置字段的属性为 NOT NULL， 在操作数据库时如果输入该字段的数据为NULL ，就会报错。
+     默认可以为空null
+
+     DEFAULT 表示设置一个字段的默认值，
+     即如果插入的时候，没有插入这个字段的值，则这个字段就是默认值
+
+
+     PRIMARY KEY 关键字用于定义列为主键。主键的值不能重复,且不能为空。【用于唯一确定某条记录】
+
+     AUTO_INCREMENT定义列为自增的属性，一般用于主键，数值会自动加1。
+          这两个一般配合起来使用，即如果一个字段是PRIMARY KEY ，并且是整数类型，则可以设置成AUTO_INCREMENT
+
+
+创建班级表
+create table class_1 (id int primary key auto_increment,name varchar(32) not null,age tinyint unsigned not null,sex enum('w','m'),score float default 0.0);
+
+创建兴趣班表
+create table interest (
+    id int primary key auto_increment,
+    name varchar(30) not null,
+    hobby set('sing','dance','draw'),
+    level char(2),
+    price decimal(7,2),
+    remark text
+);
+
+可以先在excel里如下做出表格，再如上写sql语句
+
+字段       id				name			hobby						level			price			remark
+数据类型    int				varchar(30)		set("sing","dance","draw")	char(2)			decimal(7,2)	text
+约束    primary key		    not null
+       auto_increment
+
+
+* 查看数据表
+
+  > show tables;
+
+* 查看表结构
+
+  > desc 表名;
+
+* 查看数据表创建信息
+
+  >  show create table 表名；
+
+* 删除表
+
+  > drop table 表名;
+
+
+
+
+
+
+
+
+3.6 表数据基本操作
+
+
+插入(insert)
+
+insert into 表名 values(值1),(值2),...;
+insert into 表名(字段1,...) values(值1),...;
+
+
+
+insert into class_1 values (7,'张无忌',10,'m',91),(8,'周芷若',9,'m',90);
+insert into class_1 (name,age,sex,score) values ('Lucy',17,'w',81);
+
+
+插入所有字段：这种方法，需要写出所有字段的值，
+            哪怕可以为空，可以自动增加，也不行，必须全部写出来
+insert into class_1 values
+(1,"Lily",18,'w',92),
+(2,"Tom",17,'m',76);
+
+
+插入指定的字段
+  有默认值的字段，可以不插入；
+  可以为null的字段，可以不插入；
+  主键id字段自增长，可以不插入；
+  别的都必须插入；
+insert into class_1 (name,age,sex,score)
+values
+("Abby",17,'w',87),
+("Baron",19,'m',93);
+
+                         【主键id字段自增长，所以不指定主键的值，select的时候，也可以看到新增行的id字段的值】
+                          mysql> select * from class_1;
+                          +----+-------+-----+------+-------+
+                          | id | name  | age | sex  | score |
+                          +----+-------+-----+------+-------+
+                          |  1 | Lily  |  18 | w    |    92 |
+                          |  2 | Tom   |  17 | m    |    76 |
+                          |  3 | Abby  |  17 | w    |    87 |
+                          |  4 | Baron |  19 | m    |    93 |
+                          +----+-------+-----+------+-------+
+                          4 rows in set (0.00 sec)
+
+如下，主键id字段自增长，不插入
+集合，多选时，逗号隔开
+价格decimal(7,2)，所以整数部分最多是5位数，否则报错，小数部分，自动转换成两位小数
+insert into interest  (name,hobby,level,price,remark)
+values
+("Joy",'sing',"A",15800,"天籁之音"),
+("Lily",'sing,dance',"B",66800.888,"骨骼惊奇");
+        集合，多选时，逗号隔开
+
+
+
+
+
+
+
+
+更新表字段(update),更新的是列的数据
+update 表名 set 字段1=值1,字段2=值2,... where 条件;
+  注意:update语句后如果不加where条件,所有记录【行】对应的字段全部更新
+
+update class_1 set age=11 where name='Abby';
+update class_1 set age=11,sex='m' where name='Abby';  把abby的年龄改成11，性别改成m
+
+
+
+
+
+
+删除表记录（delete），删除的是行
+delete from 表名 where 条件;
+  注意:delete语句后如果不加where条件,所有记录【行】全部清空；
+      删除的是整个行；
+
+delete from class_1 where name='Abby';
+      把name='Abby'这一行删除，此时id=3这一行没了，
+      如果继续插入新行，由于id自增长，id只会从后面累加，比如删之前id最大是11，删除之后，插入新行，id会从12开始，
+      id=2这一行就没了
+
+
+
+
+
+表字段的操作(alter)，
+  操作对象是已经创建好的表，表里可能已经有数据了
+  alter table 表名 执行动作;
+
+如下这些，后面都可以加上约束
+* 添加字段(add)
+    alter table 表名 add 字段名 数据类型;                新增字段默认添加在最后一个字段
+    alter table 表名 add 字段名 数据类型 first;          把新增字段放在第一个字段
+    alter table 表名 add 字段名 数据类型 after 字段名;    把新增字段放在哪个字段的后面
+* 删除字段(drop)
+    alter table 表名 drop 字段名;
+* 修改数据类型(modify)
+    alter table 表名 modify 字段名 新数据类型;
+* 修改字段名(change)
+    alter table 表名 change 旧字段名 新字段名 新数据类型;
+* 表重命名(rename)
+    alter table 表名 rename 新表名;
+
+
+alter table interest add tel char(11) after name;
+alter table interest drop tel;
+alter table interest modify tel char(21);   如果表里已经有数据了，则修改后的数据类型，必须能匹配上这些数据
+alter table interest change tel telphone char(21);
+alter table interest rename interes001t;
+
+
+
+
+
+
+
+
+
+
+
+时间类型数据
+
+* 日期 ： DATE                   年-月-日
+* 时间： TIME,                   小时：分钟：秒
+* 年份 ：YEAR                    年
+* 日期时间： DATETIME，           年-月-日 小时：分钟：秒
+           TIMESTAMP
+
+类型名称		    日期格式				    日期范围												    存储需求
+DATE			YYYY-MM-DD				1000-01-01 ~ 9999-12-3									3 个字节
+TIME			HH:MM:SS				-838:59:59 ~ 838:59:59									3 个字节
+YEAR			YYYY					1901 ~ 2155	                                            1 个字节
+DATETIME		YYYY-MM-DD HH:MM:SS		1000-01-01 00:00:00 ~ 9999-12-31 23:59:59				8 个字节
+TIMESTAMP		YYYY-MM-DD HH:MM:SS		1980-01-01 00:00:01 UTC ~ 2040-01-19 03:14:07 UTC		4 个字节
+
+* 时间格式
+  date ："YYYY-MM-DD"
+  time ："HH:MM:SS"
+  datetime ："YYYY-MM-DD HH:MM:SS"
+  timestamp ："YYYY-MM-DD HH:MM:SS"
+
+  > 注意:
+  > 1. datetime ：以系统时间存储
+  > 2. timestamp ：以标准时间存储但是查看时转换为系统时区，所以表现形式和datetime相同
+
+
+创建马拉松表，字段是：id，运动员名字，生日，报名时间，跑步成绩时间【跑了几小时几分钟几秒】
+create table marathon (
+id int primary key auto_increment,
+athlete varchar(32),
+birthday date,
+registration_time datetime,
+performance time
+);
+
+插入的时候，需要注意日期时间格式，如下
+insert into marathon
+(athlete,birthday,registration_time,performance)
+values
+("王菲","1981-10-12","2021-02-12 08:00:00","12:34:54"),
+("曹寒路","1991-10-12","2020-02-12 08:00:00","02:34:54");
+
+
+* 日期时间函数
+
+  * now()     返回服务器当前日期时间,格式对应datetime类型
+  * curdate() 返回当前日期，格式对应date类型
+  * curtime() 返回当前时间，格式对应time类型
+
+  例如：
+      select now();
+      select curdate();
+      select curtime();
+
+    对于now()函数，可以把报名时间字段的默认值，设置为now，别的函数没这个功能
+    这样插入数据的时候，报名时间字段不插入的话，则报名时间默认就是插入数据的时间
+    alter table marathon modify registration_time datetime default now();
+
+    insert into marathon
+    (athlete,birthday,performance)
+    values
+    ("周杰伦","1971-10-12","12:34:54");
+
+
+
+
+* 时间操作
+  时间类型数据可以进行比较和排序等操作，在写时间字符串时尽量按照标准格式书写。
+  select * from marathon where birthday>='2000-01-01';
+  select * from marathon where birthday>="2000-07-01" and performance<="2:30:00";
+
+
+
+
+
+
+

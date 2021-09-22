@@ -1,0 +1,297 @@
+
+3.9 索引操作
+
+3.9.1 概述
+索引是对数据库表中一列或多列的值,进行排序的一种结构，使用索引可快速访问数据库表中的特定信息。
+即
+给经常需要查询的字段，创建索引就行，下次查询这个字段时，就自动通过索引查询了
+
+- **优缺点**
+  - 优点 ： 加快数据检索速度,提高查找效率
+  - 缺点 ：占用数据库物理存储空间，当对表中数据更新时,索引需要动态维护,降低数据写入效率
+
+> 注意 ：
+> 1. 通常我们只在经常进行查询操作的字段上创建索引
+> 2. 对于数据量很少的表或者经常进行写操作而不是查询操作的表不适合创建索引
+
+
+
+
+3.9.2 索引分类
+
+普通(MUL)
+普通索引 ：字段值无约束,KEY标志为 MUL
+
+唯一索引(UNI)
+唯一索引(unique) ：字段值不允许重复,但可为 NULL,KEY标志为 UNI
+
+主键索引（PRI）
+一个表中只能有一个主键字段, 主键字段不允许重复,且不能为NULL，KEY标志为PRI。
+通常设置记录编号字段id,能唯一锁定一条记录
+
+
+
+ 3.9.3 索引创建
+
+创建表时直接创建索引
+create table 表名(
+字段名 数据类型，
+字段名 数据类型，
+index 索引名(字段名),
+index 索引名(字段名),
+unique 索引名(字段名)
+);
+
+
+在已有表中创建索引：
+create [unique] index 索引名 on 表名(字段名);
+
+    如下添加普通索引
+    create index name_index on class_1(name);
+
+    如下name字段，key那列，出现了标志MUL，表示普通索引
+    mysql> desc class_1;
+    +-------+---------------------+------+-----+---------+----------------+
+    | Field | Type                | Null | Key | Default | Extra          |
+    +-------+---------------------+------+-----+---------+----------------+
+    | id    | int(11)             | NO   | PRI | NULL    | auto_increment |
+    | name  | varchar(32)         | NO   | MUL | NULL    |                |
+
+    如下查看表里创建的索引
+    mysql> show index from class_1;
+    表名        字段值是否允许重复  索引名字               哪个字段创建的索引
+    +---------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+    | Table   | Non_unique | Key_name   | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment |
+    +---------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+    | class_1 |          0 | PRIMARY    |            1 | id          | A         |           8 |     NULL | NULL   |      | BTREE      |         |               |
+    | class_1 |          1 | name_index |            1 | name        | A         |           8 |     NULL | NULL   |      | BTREE      |         |               |
+    +---------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+
+
+
+主键索引添加【一般都是创建表的时候添加主键索引】
+alter table 表名 add primary key(字段);
+
+
+
+查看索引
+1、desc 表名;  --> KEY标志为：MUL 、UNI。
+2、show index from 表名;
+
+
+删除索引
+drop index 索引名 on 表名;
+alter table 表名 drop primary key;  # 删除主键
+
+
+
+
+借助性能查看选项去查看索引性能
+set  profiling = 1； 打开性能记录功能 （项目上线一般不打开）
+show profiles  查看语句执行信息
+
+
+
+
+
+
+
+
+
+
+
+3.10 外键约束和表关联关系
+
+3.10.1 外键约束
+* 约束 : 约束是一种限制，它通过对表的行或列的数据做出限制，来确保表的数据的完整性、唯一性
+* foreign key 外键功能 : 建立表与表之间的某种约束的关系，由于这种关系的存在，能够让表与表之间的数据，更加的完整，关连性更强，
+                       为了具体说明创建如下部门表和人员表。
+
+* 示例
+# 创建部门表
+CREATE TABLE dept (
+id int PRIMARY KEY auto_increment,
+dname VARCHAR(50) not null
+);
+
+# 创建人员表,
+有个字段dept_id，存放的值是部门表的id字段，即员工属于哪个部门
+这样两张表就有关联了，这两个字段的数据类型要一样
+此时部门表是主表，人员表是从表，因为一个部门，可能有多个员工
+dept_id字段就是人员表的外键，部门表的id字段是部门表的主键
+CREATE TABLE person (
+  id int PRIMARY KEY AUTO_INCREMENT,
+  name varchar(32) NOT NULL,
+  age tinyint DEFAULT 0,
+  sex enum('m','w','o') DEFAULT 'o',
+  salary decimal(8,2) DEFAULT 250.00,
+  hire_date date NOT NULL,
+  dept_id int
+) ;
+
+
+上面两个表中每个人员都应该有指定的部门，但是实际上在没有约束的情况下，人员是可以没有部门，也可以添加一个不存在的部门，这显然是不合理的。
+配置外键后，从表的外键的值，只能是主表的主键中已有的值，否则报错
+
+* 主表和从表：若同一个数据库中，B表的外键与A表的主键相对应，则A表为主表，B表为从表。
+- foreign key 外键的定义语法：
+  [constraint symbol] FOREIGN KEY（外键字段） REFERENCES tbl_name (主表主键)
+
+  [ON DELETE {RESTRICT | CASCADE | SET NULL | NO ACTION}]
+  [ON UPDATE {RESTRICT | CASCADE | SET NULL | NO ACTION}]
+
+
+
+  # 创建表时直接建立外键
+
+  CREATE TABLE person (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(32) NOT NULL,
+    age tinyint DEFAULT 0,
+    sex enum('m','w','o') DEFAULT 'o',
+    salary decimal(10,2) DEFAULT 250.00,
+    hire_date date NOT NULL,
+    dept_id int ,
+    constraint dept_fk foreign key(dept_id) references dept(id)
+              外键名字               外键字段             主表的主键
+       外键名字不能跟同一个数据库里
+            别的外键名字重复
+    );
+
+    外键名字可以不写，系统自动创建，直接这样也行oreign key(dept_id) references dept(id)
+
+
+  # 建立表后增加外键
+  alter table person add constraint dept_fk foreign key(dept_id) references dept(id);
+              表名                    外键名字            外键字段             主表（主键）
+
+
+
+通过外键名称解除外键约束
+alter table person drop foreign key dept_fk;
+> 注意：删除外键后，desc查看发现跟外键索名字一样的引标志还在，其实外键也是一种索引，需要将外键名称的索引删除之后才可以。
+如下删除索引
+drop index dept_fk on person;
+
+查看某表的外键名称
+show create table person;
+
+
+
+级联动作
+体现在修改、删除操作：
+  * restrict(默认就是这个)  :  on delete restrict  on update restrict
+    * 当主表删除记录时，如果从表中有相关联记录，则不允许主表删除
+    * 当主表更改主键字段值时，如果从表有相关记录则不允许更改
+
+  * cascade ：数据级联更新
+    * 当主表删除记录、更改被参照字段的值时,从表会级联更新【从表的行被删除，或者外键值被更改】
+    如下创建外键时，后面加上on delete cascade on update cascade
+    alter table person add constraint dept_fk foreign key(dept_id) references dept(id) on delete cascade on update cascade;
+
+  * set null  :
+    * 当主表删除记录时，从表外键字段值变为null
+    * 当主表更改主键字段值时，从表外键字段值变为null
+    如下创建外键时，后面加上on delete set null on update set null
+    alter table person add constraint dept_fk foreign key(dept_id) references dept(id) on delete set null on update set null;
+
+
+
+
+
+
+
+3.10.2 表关联设计
+当我们应对复杂的数据关系的时候，数据表的设计就显得尤为重要，认识数据之间的依赖关系是更加合理创建数据表关联性的前提。常见的数据关系如下：
+
+一对一关系
+一张表的一条记录一定只能与另外一张表的一条记录进行对应，反之亦然。
+
+举例 :  学生信息和学籍档案，一个学生对应一个档案，一个档案也只属于一个学生
+由于是一对一关系，所以在哪个表里建立外键，是一样的，这里在学籍表里建立外键，如下：
+创建学生表：
+create table student(
+id int primary key auto_increment,
+name varchar(50) not null
+);
+创建学籍表，
+建立外键st_id,即该学籍属于哪个学生，并且学生毕业或者没了，则档案也应该删除，所以外键创建成cascade
+并且由于一个学籍，只能属于一个学生，st_id字段创建成唯一索引unique，即该字段值不能重复
+create table record(
+id int primary key auto_increment,
+comment text not null,
+st_id int unique,
+constraint st_fk foreign key(st_id) references student(id) on delete cascade on update cascade
+);
+
+
+
+
+
+一对多关系
+一张表中有一条记录【主表】，可以对应另外一张表中的多条记录【从表】；
+但是反过来，另外一张表的一条记录只能对应第一张表的一条记录，这种关系就是一对多或多对一
+
+举例： 一个人可以拥有多辆汽车，但每辆车登记的车主只有一人。
+create table person(
+  id varchar(32) primary key,      【这里把主键数据类型弄成了字符串，因为人的id也有可能是驾驶证之类的，所以没写auto_increment自增加】
+  name varchar(30),
+  sex char(1),
+  age int
+);
+
+create table car(
+  id varchar(32) primary key,
+  name varchar(30),
+  price decimal(10,2),
+  pid varchar(32),                 【从表的外键数据类型，要跟主表主键保持一致，因为外键就是用来存放主键的值的】
+  constraint car_fk foreign key(pid) references person(id)
+);
+
+
+
+
+
+多对多关系
+一对表中（A）的一条记录能够对应另外一张表（B）中的多条记录；
+同时B表中的一条记录也能对应A表中的多条记录
+
+举例：一个运动员可以报多个项目，每个项目也会有多个运动员参加,
+     这时为了表达多对多关系，需要单独创建关系表。
+
+创建运动员表
+CREATE TABLE athlete (
+  id int primary key AUTO_INCREMENT,
+  name varchar(30),
+  age tinyint NOT NULL,
+  country varchar(30) NOT NULL,
+  description varchar(30)
+);
+创建项目表
+CREATE TABLE item (
+  id int primary key AUTO_INCREMENT,
+  rname varchar(30) NOT NULL
+);
+创建运动员-项目的关系表
+如果要记录运动员成绩，则也要放在关系表里，因为是哪个运动员的哪个项目的成绩
+CREATE TABLE athlete_item (
+   id int primary key auto_increment,
+   aid int NOT NULL,                  运动员id，创建外键，关联的是运动员表的主键，即id
+   tid int NOT NULL,                  项目id，创建外键，关联的是项目表的主键，即id
+   CONSTRAINT athlete_fk FOREIGN KEY (aid) REFERENCES athlete (id),
+   CONSTRAINT item_fk FOREIGN KEY (tid) REFERENCES item (id)
+);
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+

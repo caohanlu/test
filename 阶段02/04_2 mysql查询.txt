@@ -1,0 +1,456 @@
+总结
+1.查询过程
+看一下select的执行过程：
+(5)SELECT DISTINCT <select_list>
+
+(1)FROM <left_table> <join_type> JOIN <right_table> ON <on_predicate>
+
+(2)WHERE <where_predicate>
+
+(3)GROUP BY <group_by_specification>
+
+(4)HAVING <having_predicate>
+
+(6)ORDER BY <order_by_list>
+
+(7)LIMIT <limit_number>
+
+
+2. where 字句 （行筛选  row）
+   算数  比较   逻辑
+
+3. 高级查询
+    模糊查询    like
+    正则       regexp
+    起名字      as
+    聚合函数： avg() sum() max() min() count()
+    聚合分组: group by
+    聚合筛选：having
+    排序       order by
+    限制       limit
+    联合查询    union
+    子查询      （）  from后  where中
+    聚合去重：distinct
+    聚合运算
+
+
+======================================================================================
+======================================================================================
+======================================================================================
+======================================================================================
+
+
+
+
+查询过程
+看一下select的执行过程：
+(5)SELECT DISTINCT <select_list>
+
+(1)FROM <left_table> <join_type> JOIN <right_table> ON <on_predicate>
+
+(2)WHERE <where_predicate>
+
+(3)GROUP BY <group_by_specification>
+
+(4)HAVING <having_predicate>
+
+(6)ORDER BY <order_by_list>
+
+(7)LIMIT <limit_number>
+
+
+
+
+ 3.6.2 查询(select)
+select * from 表名 [where 条件];
+select 字段1,字段2 from 表名 [where 条件];
+
+查看所有字段【列】的内容
+select * from class_1;
+查看指定字段【列】的内容
+select name,age from class_1;
+
+
+
+
+3.6.3 where子句
+筛选出符合条件的行
+
+算数运算符：
+ + - * / %   加减乘除取余
+      mysql> select * from class_1 where age%2=0;
+      +----+-----------+-----+------+-------+
+      | id | name      | age | sex  | score |
+      +----+-----------+-----+------+-------+
+      |  1 | Lily      |  18 | w    |    92 |
+      |  5 | 张三      |  10 | m    |    91 |
+      |  7 | 张无忌    |  10 | m    |    91 |
+      +----+-----------+-----+------+-------+
+      3 rows in set (0.00 sec)
+
+
+比较运算符：
+  运算符				说明
+  =					等于
+  !=			    不等于，某些数据库系统也写作 <>
+  >					大于
+  <					小于
+  >=					大于或等于
+  <=					小于或等于
+  BETWEEN … AND …		介于某个范围之内，例：WHERE age BETWEEN 20 AND 30
+  NOT BETWEEN …AND …	不在某个范围之内
+  IN(项1,项2,…)		在指定项内，例：WHERE city IN('beijing','shanghai')
+  NOT IN(项1,项2,…)	不在指定项内
+  IS NULL				空值判断符
+  IS NOT NULL			非空判断符
+
+select * from class_1 where age > 8;
+select * from class_1 where age between 8 and 10;   年龄大于等于8，小于等于10的行
+select * from class_1 where age in (8,9);           年龄8岁或者9岁的行
+select * from class_1 where sex is null;
+
+
+
+
+
+逻辑运算符【null不参与逻辑运算符】
+  NOT、AND、OR		用于多个逻辑连接。
+  优先级：NOT > AND > OR    【not 、and 、or 依次执行】
+
+select * from class_1 where not sex='m' and age>9;  性别不是男【结果里不包括sex是null的行】，并且分数大于90
+
+
+
+
+优先级：算数运算符》比较运算符》逻辑运算符
+select * from class_1 where score*2=100 and age>9;
+
+
+
+
+
+
+3.7 高级查询语句
+  1. 模糊查询like：                     用这个比较多，因为mysql对正则表达式支持有限
+    百分号 %来表示任意0个或多个字符，
+    下划线_表示任意一个字符[中文字符或英文字符]。
+
+  如下查询名字以A开头的行
+  select * from class_1 where name like 'A%';
+  如下查询名字以张头的行
+  select id,name from class_1 where name like "张%";
+  如下查询名字3个字符的行
+  mysql>   select * from class_1 where name like '___';
+            +----+-----------+-----+------+-------+
+            | id | name      | age | sex  | score |
+            +----+-----------+-----+------+-------+
+            |  2 | Tom       |  17 | m    |    76 |
+            |  7 | 张无忌    |  10 | m    |    91 |
+            |  8 | 周芷若    |   9 | m    |    90 |
+
+  2. 正则查询
+     mysql只支持部分正则元字符,所以用的不多:
+
+  select * from class_1 where name regexp '^B.+';
+
+
+
+as用法
+  as用于给字段、表重命名
+  只是在该条语句中生效，语句结束后，就不再生效
+
+    mysql> select name as 姓名,age as 年龄 from class_1;
+        +-----------+--------+
+        | 姓名      | 年龄   |
+        +-----------+--------+
+        | Lily      |     20 |
+        | 张三      |     10 |
+
+  select * from class_1 as c where c.age > 17;
+
+
+
+
+3.8 聚合操作
+3.8.1 聚合函数
+
+| 方法          | 功能                 |
+| ------------- | -------------------- |
+| avg(字段名)   | 该字段的平均值       |
+| max(字段名)   | 该字段的最大值       |
+| min(字段名)   | 该字段的最小值       |
+| sum(字段名)   | 该字段所有记录的和   |
+| count(字段名) | 统计该字段记录的个数 |
+
+select后面有聚合函数的话，
+则不能写其他字段，只能写聚合函数，即不能如下写
+select name，max(attack) from sanguo;
+
+找出表中的最大攻击力的值和平均值？
+select max(attack)，avg(attack) from sanguo;
+
+表中共有多少个行？
+select count(*) as 数量 from sanguo;
+
+蜀国英雄中攻击值大于200的英雄的数量
+select count(*) from sanguo where attack > 200;
+
+
+
+
+
+
+
+3.8.2 聚合分组
+
+group by  给查询的结果进行分组，相同的值，为一组
+
+按照哪个字段分组，则select后面就只能写哪个字段，但是可以写聚合函数
+如下按照国家分组，分成三组
+    mysql> select country from sanguo group by country;
+    +---------+
+    | country |
+    +---------+
+    | 魏      |
+    | 蜀      |
+    | 吴      |
+    +---------+
+    3 rows in set (0.00 sec)
+
+按照哪个字段分组，则select后面就只能写哪个字段，但是可以写聚合函数
+如下按照国家分组，并且计算出每组的数量
+    mysql> select country,count(*) from sanguo group by country;
+    +---------+----------+
+    | country | count(*) |
+    +---------+----------+
+    | 魏      |        4 |
+    | 蜀      |        5 |
+    | 吴      |        4 |
+    +---------+----------+
+    3 rows in set (0.00 sec)
+
+
+如下按照国家分组，并计算每个国家的平均攻击力
+    mysql> select country,avg(attack) from sanguo group by country;
+    +---------+-------------+
+    | country | avg(attack) |
+    +---------+-------------+
+    | 魏      |    279.5000 |
+    | 蜀      |    273.8000 |
+    | 吴      |    252.7500 |
+    +---------+-------------+
+    3 rows in set (0.00 sec)
+
+
+
+对多个字段分组，此时多个字段都相同时为一组
+如下，国家、性别相同的行，是一组，并计算出每组的数量，即每组有多少行
+mysql> select country,gender,count(*) from sanguo group by country,gender;
+    +---------+--------+----------+
+    | country | gender | count(*) |
+    +---------+--------+----------+
+    | 魏      | 男     |        3 |
+    | 魏      | 女     |        1 |
+    | 蜀      | 男     |        4 |
+    | 蜀      | 女     |        1 |
+    | 吴      | 男     |        2 |
+    | 吴      | 女     |        2 |
+    +---------+--------+----------+
+    6 rows in set (0.01 sec)
+
+
+
+
+所有国家的男英雄中，英雄数量前2名国家的，国家名称及英雄数量
+select country,count(id) as number from sanguo
+where gender='男'
+group by country
+order by number desc
+limit 2;
+
+
+>  注意： 使用分组时，select后的字段，为group by分组的字段和聚合函数，不能包含其他内容。
+        group by也可以同时依照多个字段分组，如group by A，B 此时必须A,B两个字段值均相同才算一组。
+
+
+
+
+
+
+3.8.3 聚合筛选
+
+having语句
+    必须和group by配合使用，对分组、聚合后的结果进行进一步筛选
+    where不可使用聚合函数，having可以，对聚合函数的聚合结果进行筛选
+
+
+找出平均攻击力大于105的国家的前2名,显示国家名称和平均攻击力
+select country,avg(attack) from sanguo
+group by country
+having avg(attack)>105
+order by avg(attack) DESC
+limit 2;
+
+
+
+
+
+
+
+
+
+排序
+  ORDER BY 子句来设定你想按哪个字段、哪种方式，来进行排序，再返回搜索结果。
+  SELECT field1, field2,...fieldN from table_name1 where field1
+  ORDER BY field1 [ASC [DESC]]
+
+  默认情况是ASC，表示升序，
+          DESC，表示降序
+
+  如下，性别是男m的行，按照年龄降序排列：
+  select * from class_1 where sex='m' order by age desc;
+
+  复合排序：对多个字段排序，即当第一排序项相同时，按照第二排序项排序
+  如下，按照年龄降序，当年龄相同时候，按照分数升序排序
+  select * from class_1 order by age desc,score;
+
+
+
+
+
+
+限制
+  LIMIT 子句用于限制由 SELECT 语句返回的数据数量 或者 UPDATE,DELETE语句的操作数量
+  带有 LIMIT 子句的 SELECT 语句的基本语法如下：
+
+      sql
+      SELECT column1, column2, columnN
+      FROM table_name
+      WHERE field
+      LIMIT [num]
+
+    如下，性别是m的行中，只选择前两行
+    mysql> select * from class_1 where sex='m' limit 2;
+    +----+-------+-----+------+-------+
+    | id | name  | age | sex  | score |
+    +----+-------+-----+------+-------+
+    |  2 | Tom   |  17 | m    |    76 |
+    |  4 | Baron |  19 | m    |    93 |
+    +----+-------+-----+------+-------+
+    2 rows in set (0.00 sec)
+
+    把性别是m的行中，只把前2行的分数score改成100
+    update class_1 set score=100 where sex='m' limit 2;
+
+    把性别是m的行中,前一行的记录删掉
+    delete from class_1 where sex='m' limit 1;
+
+    把性别是m的行中，按照分数降序排列，并只select前一行
+    select * from class_1 where sex='m' order by score desc limit 1;
+
+
+
+
+
+
+
+
+* 联合查询
+
+  UNION操作符用于连接两个或多个的 SELECT 语句的结果组合到一个结果集合中。
+  默认UNION后为 DISTINCT，表示删除结果集中重复的数据。
+  如果使用ALL则返回所有结果集，包含重复数据。
+
+  UNION 操作符语法格式：
+  SELECT expression1, expression2, ... expression_n
+  FROM tables
+  [WHERE conditions]
+  UNION [ALL | DISTINCT]
+  SELECT expression1, expression2, ... expression_n
+  FROM tables
+  [WHERE conditions];
+
+
+union的执行结果，类似or，即如下两条语句，执行结果一样
+    但是如果条件很复杂的时候，or不太好写，union可以把复杂的条件拆成两条语句写，
+    而且union的执行效率，比or高；
+select * from class_1 where sex='m' or age > 23;
+select * from class_1 where sex='m' UNION  select * from class_1 where age > 9;
+
+
+可以对执行结果整体进行排序，order by只能写在最后面
+select * from class_1 where sex='m' UNION  select * from class_1 where age > 9 order by age;
+
+
+
+
+
+
+
+
+子查询
+  定义 ： 当一个select语句中包含另一个select查询语句，则称之为有子查询的语句
+
+  * 子查询出现的位置：
+    1. from之后 ，此时子查询的内容作为一个新的表内容，外层select对新表内容进行查询
+        >注意：必须将子查询结果集重命名一下，方便where子句中的引用操作
+              即使不用，也要重命名
+    select * from (select * from class_1 where sex='m') as s where s.score > 90;
+
+
+    2. where字句中，此时select查询到的内容作为外层查询的条件值
+
+    查找年龄跟tom年龄相等的行：
+    select *  from class_1 where age = (select age from class_1 where name='Tom');
+    > 注意：
+    > 1. 子句结果作为一个值使用时，返回的结果需要一个明确值【一行一列确定的单个元素】，不能是多行或者多列。
+    > 2. 如果子句结果作为一个集合使用，即where子句中是in操作，则结果可以是一个字段的多个记录。【即一列多行】
+
+    查跟李莫愁或周芷若分数一样的行
+    select *  from class_1 where score in (
+    select score from class_1 where name='李莫愁' or name='周芷若'
+    );
+
+
+
+
+
+
+3.8.4 去重语句
+
+distinct语句
+    不显示字段重复值
+表中都有哪些国家
+mysql> select distinct country from sanguo;
++---------+
+| country |
++---------+
+| 魏      |
+| 蜀      |
+| 吴      |
++---------+
+3 rows in set (0.00 sec)
+
+计算一共有多少个国家
+select count(distinct country) from sanguo;
+
+name,country两个字段都相同的行，才算一样，去重
+select distinct name,country from sanguo;
+> 注意: distinct和from之间所有字段都相同才会去重
+
+
+
+3.8.5 聚合运算
+查询表记录,更新字段时，做数学运算
+运算符 ： +  -  *  /  %
+
+查询时显示攻击力翻倍
+  select name,attack*2 from sanguo;
+更新蜀国所有英雄攻击力 * 2
+  update sanguo set attack=attack*2 where country='蜀国';
+
+
+
+
+
+
