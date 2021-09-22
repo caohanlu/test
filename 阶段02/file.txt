@@ -90,10 +90,28 @@ root@caohanlu:~# cat /root/.gitconfig
     drwxr-xr-x  7 root root 4096 Sep 22 16:58 .git/
 
 
+
+* 设置忽略文件
+  即在操作目录下touch .gitignore，创建隐藏文件，
+  并把不希望记录到暂存区的文件、目录，写到.gitignore 文件里，
+  然后git add  .gitignore 添加隐藏文件
+
+  在GIT项目中可以在项目根目录添加.gitignore文件的方式，规定相应的忽略规则，用来管理当前项目中的文件的忽略行为。
+  .gitignore 文件是可以提交到公有仓库中，这就为该项目下的所有开发者都共享一套定义好的忽略规则。
+  在.gitignore 文件中，遵循相应的语法，在每一行指定一个忽略规则。
+
+  .gitignore忽略规则简单说明
+  file            表示忽略文件名为file的文件
+  *.a             表示忽略所有 .a 结尾的文件
+  !lib.a          表示但lib.a除外
+  build/          表示忽略 build/目录下的所有文件，过滤整个build文件夹；
+
+
+
 * 查看本地仓库状态
   git  status
   说明: 初始化仓库后默认工作在master分支，
-        当工作区与仓库区不一致时会有提示。
+        当工作区与仓库区不一致时会有提示，需要进行下面的git add
 
 
   
@@ -101,13 +119,18 @@ root@caohanlu:~# cat /root/.gitconfig
 * 将工作内容记录到暂存区
   git add [files..]
   
-  e.g. 将文件 a ，b 记录到暂存区
+  将文件 a ，b 记录到暂存区
   git add  a b
   
-  e.g. 将所有文件（不包含隐藏文件）记录到暂存区
+  将所有文件（不包含隐藏文件）记录到暂存区
   git add  *
     root@caohanlu:~/PycharmProjects/pythonProject# git add  *
     root@caohanlu:~/PycharmProjects/pythonProject#
+
+    root@caohanlu:~/PycharmProjects/pythonProject# git add  .gitignore      添加隐藏文件
+
+
+  【add后如果再次修改文件，则git  status会有问题，需要重新add被修改的文件】
 
 
 
@@ -115,39 +138,27 @@ root@caohanlu:~# cat /root/.gitconfig
   git rm --cached [file] 
 
 
-* 设置忽略文件
-  在GIT项目中可以在项目根目录添加.gitignore文件的方式，规定相应的忽略规则，用来管理当前项目中的文件的忽略行为。
-  .gitignore 文件是可以提交到公有仓库中，这就为该项目下的所有开发者都共享一套定义好的忽略规则。
-  在.gitignore 文件中，遵循相应的语法，在每一行指定一个忽略规则。
-
-  .gitignore忽略规则简单说明
-  file            表示忽略file文件
-  *.a             表示忽略所有 .a 结尾的文件
-  !lib.a          表示但lib.a除外
-  build/          表示忽略 build/目录下的所有文件，过滤整个build文件夹；
-
 
 
   
 
 * 将文件同步到本地仓库
-
-```
 git commit [file] -m [message]
-说明: -m表示添加一些同步信息，表达同步内容,不加file表示同步所有暂存记录的文件
+说明: -m表示添加一些同步信息，表达同步内容,
+    不加file文件名表示同步所有暂存记录的文件
 
 e.g.  将暂存区所有记录同步到仓库区
 git commit  -m 'add files'
-```
+
+root@caohanlu:~/PycharmProjects/pythonProject# git commit  -m 'add files'
+
 
 
 
 * 查看commit 日志记录
-
-  ```
   git log
   git log --pretty=oneline
-  ```
+
 
   
 
